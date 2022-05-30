@@ -1,0 +1,7 @@
+dialite==0.5.3
+flexx==0.8.4
+pip==22.0.4
+pscript==0.7.7
+setuptools==58.1.0
+tornado==6.1
+webruntime==0.5.8
