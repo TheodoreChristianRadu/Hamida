@@ -1,5 +1,4 @@
 from flexx import flx
-
 from Engine import Engine
 
 
@@ -14,24 +13,30 @@ class Screen(flx.Label):
             'font-size': f'{100 / size[1] / 0.7}vh',
             'line-height': '0.7em',
             'word-break' : 'break-all'
-        }
+            }
         self.apply_style(style)
         self.set_wrap(1)
 
-    def display(self):
-        self.set_text(1000 * "I WANNA See how IT LOOks")
 
-
-class Window(flx.Widget):
+class Hamida(flx.PyWidget):
 
     def init(self):
         with flx.HBox():
-            Screen(32, 16).display()
+            self.button = flx.Button(text='Start')
+            self.screen = Screen(32, 16)
+        self.engine = Engine(32 * 16, 10)
+        self.engine.render = self.render
+
+    @flx.reaction('button.pointer_click')
+    def start(self, *events):
+        self.engine.start()
+        self.engine.execute('>+++++[<++++++++++>-]<[++.-.-.]')
+
+    @flx.reaction
+    def render(self, *events):
+        self.screen.set_text(''.join(self.engine.buffer))
 
 
 if __name__ == '__main__':
-    hamida = Engine(32 * 16, 10)
-    hamida.start()
-    hamida.execute('++[++.--.]')
-    flx.App(Window).launch('Browser')
+    flx.App(Hamida).launch('Browser')
     flx.run()
