@@ -25,6 +25,7 @@
     <Compile Include="Engine.py" />
     <Compile Include="Hamida.py" />
     <Compile Include="Interpreter.py" />
+    <Compile Include="Memory.py" />
     <Compile Include="Stream.py" />
     <Compile Include="Timer.py" />
   </ItemGroup>
