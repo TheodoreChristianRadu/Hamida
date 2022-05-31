@@ -11,15 +11,15 @@ class Engine(Thread):
         super().__init__()
         self.delay = 1 / fps
         self.capacity = capacity
-        self.buffer = []
+        self.buffer = capacity * [' ']
         self.stream = Stream()
         self.interpreter = None
 
     def run(self):
         while (True):
             with Timer(self.delay):
-                output = self.stream.output.read()
-                self.buffer += output
+                for i in range(self.capacity):
+                    self.buffer[i] = self.stream.output.receive()
                 print('Buffer', self.buffer)
 
     def execute(self, brainfuck):
@@ -34,4 +34,3 @@ class AlreadyRunning(Exception):
 
     def __init__(self):
         super().__init__("The engine is already executing some code")
-

@@ -14,11 +14,11 @@ class Input():
         self.queue = Queue()
         self.request = False
 
-    def __call__(self, value):
+    def send(self, value):
         if (self.request):
             self.queue.put(value)
 
-    def expect(self):
+    def receive(self):
         self.request = True
         result = self.queue.get()
         self.request = False
@@ -30,9 +30,8 @@ class Output():
     def __init__(self):
         self.queue = Queue()
 
-    def __call__(self, value):
+    def send(self, value):
         self.queue.put(value)
 
-    def read(self):
-        while (not self.queue.empty()):
-            yield self.queue.get()
+    def receive(self):
+        return self.queue.get()
