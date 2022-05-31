@@ -32,6 +32,6 @@ class Window(flx.Widget):
 if __name__ == '__main__':
     hamida = Engine(32 * 16, 10)
     hamida.start()
-    hamida.execute('+++' + '.' * 10000)
+    hamida.execute('++[++.--.]')
     flx.App(Window).launch('Browser')
     flx.run()
