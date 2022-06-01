@@ -7,13 +7,13 @@ from Timer import Timer
 class Engine(Thread):
 
     def __init__(self, capacity, fps):
-        super().__init__()
+        Thread.__init__(self)
         self.delay = 1 / fps
         self.capacity = capacity
         self.buffer = capacity * [' ']
         self.stream = Stream()
         self.interpreter = None
-        self.render = lambda: None
+        self.render = lambda buffer: None
 
     def run(self):
         while (True):
@@ -21,7 +21,7 @@ class Engine(Thread):
                 # Send inputs
                 for i in range(self.capacity):
                     self.buffer[i] = chr(self.stream.output.receive())
-                self.render()
+                self.render(self.buffer)
 
     def execute(self, brainfuck):
         if (not self.interpreter):

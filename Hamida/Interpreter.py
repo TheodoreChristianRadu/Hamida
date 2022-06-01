@@ -5,7 +5,7 @@ from Memory import Memory
 class Interpreter(Thread):
 
     def __init__(self, brainfuck, stream):
-        super().__init__()
+        Thread.__init__(self)
         self.code = Interpreter.transpile(brainfuck)
         self.memory = Memory(int)
         self.stream = stream

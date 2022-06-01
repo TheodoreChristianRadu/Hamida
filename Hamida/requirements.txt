@@ -1,7 +1,5 @@
-dialite==0.5.3
-flexx==0.8.4
-pip==22.0.4
-pscript==0.7.7
-setuptools==58.1.0
-tornado==6.1
-webruntime==0.5.8
+pip==22.1.2
+setuptools==62.3.2
+PyQt6==6.3.0
+PyQt6-Qt6==6.3.0
+PyQt6-sip==13.3.1

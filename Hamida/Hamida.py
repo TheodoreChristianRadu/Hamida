@@ -1,42 +1,66 @@
-from flexx import flx
-from Engine import Engine
+from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QTextBrowser
+from PyQt6.QtGui import QAction, QFont, QTextOption
+from PyQt6.QtCore import pyqtSignal
+from Engine import Engine, AlreadyRunning
 
 
-class Screen(flx.Label):
+class Screen(QTextBrowser):
 
-    def init(self, *size):
-        style = {
-            'aspect-ratio': f'{size[0]} / {1.81 * size[1] * 0.7}',
-            'background': 'black',
-            'color': 'white',
-            'font-family': 'monospace',
-            'font-size': f'{100 / size[1] / 0.7}vh',
-            'line-height': '0.7em',
-            'word-break' : 'break-all'
-            }
-        self.apply_style(style)
-        self.set_wrap(1)
+    render = pyqtSignal(str)
+
+    def __init__(self):
+        QTextBrowser.__init__(self)
+        font = QFont('Monospace')
+        font.setStyleHint(QFont.StyleHint.Monospace)
+        font.setPixelSize(30)
+        self.setFont(font)
+        self.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere)
+        self.render.connect(lambda data: self.setText(data))
 
 
-class Hamida(flx.PyWidget):
+class Toolbar(QToolBar):
 
-    def init(self):
-        with flx.HBox():
-            self.button = flx.Button(text='Start')
-            self.screen = Screen(32, 16)
+    def __init__(self):
+        QToolBar.__init__(self)
+        self.play = QAction('Test')
+        self.addAction(self.play)
+
+
+class Window(QMainWindow):
+
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.screen = Screen()
+        self.setCentralWidget(self.screen)
+        self.toolbar = Toolbar()
+        self.addToolBar(self.toolbar)
+
+
+class Application(QApplication):
+    
+    def __init__(self, name):
+        QApplication.__init__(self, [])
+        self.setApplicationName(name)
         self.engine = Engine(32 * 16, 10)
-        self.engine.render = self.render
-
-    @flx.reaction('button.pointer_click')
-    def start(self, *events):
         self.engine.start()
-        self.engine.execute('>+++++[<++++++++++>-]<[++.-.-.]')
+        self.engine.render = lambda buffer: self.update(buffer)
+        self.window = Window()
+        self.window.toolbar.play.triggered.connect(lambda: self.play())
 
-    @flx.reaction
-    def render(self, *events):
-        self.screen.set_text(''.join(self.engine.buffer))
+    def play(self):
+        try:
+            self.engine.execute('>+++++[<++++++++++>-]<[++.-.-.]')
+        except AlreadyRunning as exception:
+            print(exception)
+
+    def update(self, buffer):
+        self.window.screen.render.emit(''.join(buffer))
+
+    def exec(self):
+        self.window.showMaximized()
+        QApplication.exec()
 
 
 if __name__ == '__main__':
-    flx.App(Hamida).launch('Browser')
-    flx.run()
+    hamida = Application('Hamida')
+    hamida.exec()
