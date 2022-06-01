@@ -28,10 +28,10 @@ class Engine(Thread):
             self.interpreter = Interpreter(brainfuck, self.stream)
             self.interpreter.start()
         else:
-            raise AlreadyRunning
+            raise AlreadyFucking
 
 
-class AlreadyRunning(Exception):
+class AlreadyFucking(Exception):
 
     def __init__(self):
-        super().__init__("The engine is already executing some code")
+        Exception.__init__(self, "Hamida is already fucking with someone else's brain")

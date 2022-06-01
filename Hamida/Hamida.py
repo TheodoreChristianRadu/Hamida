@@ -1,60 +1,69 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QTextBrowser
-from PyQt6.QtGui import QAction, QFont, QTextOption
-from PyQt6.QtCore import pyqtSignal
-from Engine import Engine, AlreadyRunning
+from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QWidget, QGridLayout, QLabel
+from PyQt6.QtGui import QFont, QAction
+from PyQt6.QtCore import pyqtSignal, Qt
+from Engine import Engine, AlreadyFucking
 
 
-class Screen(QTextBrowser):
+class Screen(QWidget):
 
-    render = pyqtSignal(str)
+    update = pyqtSignal(list)
 
-    def __init__(self):
-        QTextBrowser.__init__(self)
-        font = QFont('Monospace')
-        font.setStyleHint(QFont.StyleHint.Monospace)
-        font.setPixelSize(30)
-        self.setFont(font)
-        self.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere)
-        self.render.connect(lambda data: self.setText(data))
+    def __init__(self, *size):
+        QWidget.__init__(self)
+        self.width, self.height = size
+        self.grid = QGridLayout()
+        self.grid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        for i in range(self.height):
+            for j in range(self.width):
+                self.grid.addWidget(self.Element(), i, j)
+        self.setLayout(self.grid)
+        self.update.connect(lambda data: self.render(data))
+
+    class Element(QLabel):
+         def __init__(self):
+             QLabel.__init__(self)
+             font = QFont('Monospace')
+             font.setStyleHint(QFont.StyleHint.Monospace)
+             font.setPixelSize(50)
+             self.setFont(font)
+
+    def render(self, data):
+        for i in range(len(data)):
+                element = self.grid.itemAt(i).widget()
+                element.setText(data[i])
 
 
 class Toolbar(QToolBar):
 
     def __init__(self):
         QToolBar.__init__(self)
-        self.play = QAction('Test')
+        self.play = QAction('Play')
         self.addAction(self.play)
 
 
-class Window(QMainWindow):
-
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.screen = Screen()
-        self.setCentralWidget(self.screen)
-        self.toolbar = Toolbar()
-        self.addToolBar(self.toolbar)
-
-
-class Application(QApplication):
+class Application(QApplication, QMainWindow):
     
-    def __init__(self, name):
+    def __init__(self, name, size):
         QApplication.__init__(self, [])
         self.setApplicationName(name)
-        self.engine = Engine(32 * 16, 10)
+        self.window = QMainWindow()
+        self.screen = Screen(*size)
+        self.window.setCentralWidget(self.screen)
+        self.toolbar = Toolbar()
+        self.toolbar.play.triggered.connect(lambda: self.play())
+        self.window.addToolBar(self.toolbar)
+        self.engine = Engine(size[0] * size[1], 10)
         self.engine.start()
         self.engine.render = lambda buffer: self.update(buffer)
-        self.window = Window()
-        self.window.toolbar.play.triggered.connect(lambda: self.play())
 
     def play(self):
         try:
             self.engine.execute('>+++++[<++++++++++>-]<[++.-.-.]')
-        except AlreadyRunning as exception:
+        except AlreadyFucking as exception:
             print(exception)
 
     def update(self, buffer):
-        self.window.screen.render.emit(''.join(buffer))
+        self.screen.update.emit(buffer)
 
     def exec(self):
         self.window.showMaximized()
@@ -62,5 +71,5 @@ class Application(QApplication):
 
 
 if __name__ == '__main__':
-    hamida = Application('Hamida')
+    hamida = Application('Hamida', (32, 16))
     hamida.exec()
